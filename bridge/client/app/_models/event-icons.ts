@@ -8,4 +8,5 @@ export const EVENT_ICONS = {
   "remediation": "criticalevent",
   "release": "hops",
   "approval": "unknown",
+  "default": "information"
 };

@@ -7,6 +7,7 @@ import { Deployment } from './deployment';
 import {EventTypes} from "./event-types";
 import * as moment from 'moment';
 import {DeploymentStage} from './deployment-stage';
+import {Sequence} from "./sequence";
 
 export class Project {
   projectName: string;
@@ -19,6 +20,8 @@ export class Project {
   stages: Stage[];
   services: Service[];
   sequences: Root[];
+
+  sequenceStates: Sequence[];
 
   getServices(stage?: Stage): Service[] {
     if(this.services && !stage) {
@@ -141,6 +144,7 @@ export class Project {
       return Stage.fromJSON(stage);
     });
     project.setDeployments();
+    project.sequenceStates = [];
     return project;
   }
 }

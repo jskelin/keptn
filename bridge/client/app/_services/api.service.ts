@@ -172,7 +172,7 @@ export class ApiService {
     return this.getSequences(projectName, 'remediation', 'triggered');
   }
 
-  public getSequences(projectName: string, sequenceName?: string, state?: string, fromTime?: string, beforeTime?: string): Observable<HttpResponse<SequenceResult>> {
+  public getSequences(projectName: string, sequenceName?: string, state?: string, fromTime?: string, beforeTime?: string, pageSize?: number): Observable<HttpResponse<SequenceResult>> {
     const url = `${this._baseUrl}/controlPlane/v1/sequence/${projectName}`;
     const params: any = {};
     if (sequenceName) {
@@ -186,6 +186,9 @@ export class ApiService {
     }
     if (beforeTime) {
       params.beforeTime = beforeTime;
+    }
+    if (pageSize) {
+      params.pageSize = pageSize;
     }
     return this.http
       .get<SequenceResult>(url, { params, observe: 'response' });
