@@ -134,6 +134,10 @@ export class Project {
     }, [null]);
   }
 
+  public getSequenceStates(): Sequence[] {
+    return this.sequenceStates || [];
+  }
+
   static fromJSON(data: any) {
     const project = Object.assign(new this(), data);
     project.stages = project.stages.map(stage => {
@@ -144,7 +148,6 @@ export class Project {
       return Stage.fromJSON(stage);
     });
     project.setDeployments();
-    project.sequenceStates = [];
     return project;
   }
 }

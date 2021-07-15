@@ -48,7 +48,7 @@ export class DataService {
   }
 
   get taskNames(): Observable<string[]> {
-    return  this._taskNames.asObservable();
+    return this._taskNames.asObservable();
   }
 
   get taskNamesTriggered(): Observable<string[]> {
@@ -79,10 +79,6 @@ export class DataService {
 
   get changedDeployments(): Observable<Deployment[]> {
     return this._changedDeployments.asObservable();
-  }
-
-  get sequences(): Observable<Sequence[]> {
-    return this._sequences.asObservable();
   }
 
   get isQualityGatesOnly(): Observable<boolean> {
@@ -175,7 +171,6 @@ export class DataService {
     this.loadKeptnInfo();
   }
 
-
   public loadProject(projectName: string) {
     this.apiService.getProject(projectName)
       .pipe(
@@ -198,6 +193,15 @@ export class DataService {
           projects.map(project => Project.fromJSON(project))
         )
       ).subscribe((projects: Project[]) => {
+      const existingProjects = this._projects.getValue();
+      projects = projects.map(project => {
+        const existingProject = existingProjects?.find(p => p.projectName === project.projectName);
+        if (existingProject) {
+          return Object.assign(existingProject, project);
+        } else {
+          return project;
+        }
+      });
       this._projects.next(projects);
     }, () => {
       this._projects.next([]);
@@ -463,13 +467,13 @@ export class DataService {
         map(sequenceResult => sequenceResult.states),
         map(sequences => sequences.map(sequence => Sequence.fromJSON(sequence)).sort((sA, sB) => moment(sA.time).isBefore(sB.time) ? -1 : 1))
       ).subscribe((newSequenceStates: Sequence[]) => {
-        project.sequenceStates = project.sequenceStates.map(sequence => newSequenceStates.find(s => s.shkeptncontext == sequence.shkeptncontext) || sequence);
-        newSequenceStates.forEach(sequenceState => {
-          if(project.sequenceStates.length == 0 || moment(sequenceState.time).isAfter(project.sequenceStates[0].time))
-            project.sequenceStates.unshift(sequenceState);
-        });
+      project.sequenceStates = project.getSequenceStates().map(sequence => newSequenceStates.find(s => s.shkeptncontext == sequence.shkeptncontext) || sequence);
+      newSequenceStates.forEach(sequenceState => {
+        if (project.getSequenceStates().length == 0 || moment(sequenceState.time).isAfter(project.getSequenceStates()[0].time))
+          project.getSequenceStates().unshift(sequenceState);
+      });
 
-        this._sequences.next(newSequenceStates);
+      this._sequences.next(newSequenceStates);
     });
   }
 
